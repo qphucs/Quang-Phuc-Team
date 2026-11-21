@@ -28,7 +28,9 @@ const selectClass =
 const areaClass =
   "w-full rounded-sm border border-line bg-surface px-3 py-2 text-base text-ink focus-visible:border-brand focus-visible:bg-white focus-visible:outline-none";
 
-export function SkillEditor({ initial }: { initial?: Initial }) {
+export type LevelOption = { id: string; number: number; name: string };
+
+export function SkillEditor({ initial, levels }: { initial?: Initial; levels: LevelOption[] }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [status, setStatus] = useState<"draft" | "published">(initial?.status ?? "draft");
@@ -174,6 +176,23 @@ export function SkillEditor({ initial }: { initial?: Initial }) {
           <Label htmlFor="capcut">Link template CapCut (không bắt buộc)</Label>
           <Input id="capcut" inputMode="url" autoCapitalize="none" {...register("capcutTemplateUrl")} />
           <FieldError>{errors.capcutTemplateUrl?.message}</FieldError>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="levelId">Level</Label>
+            <select id="levelId" className={selectClass} {...register("levelId")}>
+              <option value="">Chưa xếp level</option>
+              {levels.map((l) => (
+                <option key={l.id} value={l.id}>
+                  Level {l.number}: {l.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <label className="flex min-h-11 items-center gap-3 self-end text-sm font-medium text-ink">
+            <input type="checkbox" className="size-5 accent-[var(--color-brand-ink)]" {...register("isRequired")} />
+            Bài bắt buộc trong level
+          </label>
         </div>
         <div>
           <Label>Ảnh bìa</Label>

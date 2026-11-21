@@ -5,6 +5,7 @@ import { files, learningProgress, skillAttachments, skills, skillSteps } from "@
 import type { SessionUser } from "@/lib/auth";
 import { writeAudit } from "@/lib/audit";
 import { AppError } from "@/lib/errors";
+import { assertSkillUnlocked } from "@/lib/levels";
 import { emit } from "@/lib/realtime";
 import { youtubeId, type SkillInput } from "./schemas";
 
@@ -33,22 +34,22 @@ async function uniqueSlug(title: string, exceptId?: string): Promise<string> {
 
 /** Creates or updates a skill and replaces its steps and attachments in one transaction. */
 export async function saveSkill(actor: SessionUser, input: SkillInput & { id?: string }) {
+  const title = input.title as string;
   const values = {
-    title: input.title as string,
-    summary: (input.summary as string) ?? "",
+    title,
+    summary: (input.summary as string | undefined) ?? "",
     difficulty: (input.difficulty ?? "basic") as "basic" | "intermediate" | "advanced",
     durationMin: Number(input.durationMin ?? 0),
     tags: (input.tags as string[] | undefined) ?? [],
-    coverFileId: input.coverFileId ?? null,
+    coverFileId: (input.coverFileId as string | null | undefined) ?? null,
     videoKind: input.videoKind === "upload" || input.videoKind === "embed" ? input.videoKind : null,
-    videoFileId: input.videoKind === "upload" ? (input.videoFileId ?? null) : null,
+    videoFileId: input.videoKind === "upload" ? ((input.videoFileId as string | null | undefined) ?? null) : null,
     videoEmbedUrl: input.videoKind === "embed" ? ((input.videoEmbedUrl as string | undefined) ?? null) : null,
     capcutTemplateUrl: (input.capcutTemplateUrl as string | undefined) ?? null,
-    levelId: input.levelId ?? null,
+    levelId: (input.levelId as string | null | undefined) ?? null,
     isRequired: Boolean(input.isRequired),
     updatedAt: new Date(),
   };
-
   const id = await db.transaction(async (tx) => {
     let skillId: string;
     if (input.id) {
@@ -58,14 +59,14 @@ export async function saveSkill(actor: SessionUser, input: SkillInput & { id?: s
         .where(and(eq(skills.id, input.id), isNull(skills.deletedAt)))
         .limit(1);
       if (!existing) throw new AppError("NOT_FOUND");
-      const slug = existing.title === values.title ? undefined : await uniqueSlug(values.title, existing.id);
+      const slug = existing.title === title ? undefined : await uniqueSlug(title, existing.id);
       await tx
         .update(skills)
         .set({ ...values, ...(slug ? { slug } : {}) })
         .where(eq(skills.id, existing.id));
       skillId = existing.id;
     } else {
-      const slug = await uniqueSlug(values.title);
+      const slug = await uniqueSlug(title);
       const [row] = await tx
         .insert(skills)
         .values({ ...values, slug, authorId: actor.id, status: "draft" })
@@ -215,6 +216,7 @@ export async function getPublishedSkillBySlug(slug: string, userId: string) {
     .where(and(eq(skills.slug, slug), eq(skills.status, "published"), isNull(skills.deletedAt)))
     .limit(1);
   if (!skill) throw new AppError("NOT_FOUND", "Không tìm thấy bài học này.");
+  await assertSkillUnlocked(userId, skill.levelId);
 
   const steps = await db
     .select()

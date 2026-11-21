@@ -63,7 +63,7 @@ export const skillInputSchema = z
     videoFileId: z.uuid().nullable().optional(),
     videoEmbedUrl: embedUrl,
     capcutTemplateUrl: optionalUrl,
-    levelId: z.uuid().nullable().optional(),
+    levelId: z.preprocess((v) => (v === "" ? null : v), z.uuid().nullable().optional()),
     isRequired: z.boolean().default(false),
     steps: z.array(skillStepSchema).max(30, "Tối đa 30 bước.").default([]),
     attachments: z.array(skillAttachmentSchema).max(20, "Tối đa 20 tài liệu.").default([]),

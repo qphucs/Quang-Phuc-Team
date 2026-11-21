@@ -72,10 +72,10 @@
 
 ## Sprint 4 — Lộ trình học
 
-- [ ] Bảng `levels`, `learning_progress`; admin tạo level, xếp bài, đánh dấu bài bắt buộc
-- [ ] Member: màn lộ trình (level khóa/mở), nút "Đã học", % tiến độ, level hiện tại trên hồ sơ
-- [ ] Admin: ma trận tiến độ người × level, xem chi tiết từng người
-- [ ] Realtime: member học xong → bảng admin cập nhật ngay
+- [x] Bảng `levels`, `learning_progress`; admin tạo level, xếp bài, đánh dấu bài bắt buộc
+- [x] Member: màn lộ trình (level khóa/mở), nút "Đã học", % tiến độ, level hiện tại trên hồ sơ
+- [x] Admin: ma trận tiến độ người × level, xem chi tiết từng người
+- [x] Realtime: member học xong → bảng admin cập nhật ngay
 
 **Xong khi:** member học xong bài bắt buộc Level 1 → Level 2 tự mở; admin thấy ngay.
 

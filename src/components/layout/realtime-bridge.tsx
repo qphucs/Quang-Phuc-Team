@@ -32,6 +32,8 @@ export function RealtimeBridge() {
       if (type.startsWith("learning.")) {
         void queryClient.invalidateQueries({ queryKey: ["my-learning"] });
         void queryClient.invalidateQueries({ queryKey: ["learning-matrix"] });
+        void queryClient.invalidateQueries({ queryKey: ["levels-progress"] });
+        void queryClient.invalidateQueries({ queryKey: ["levels"] });
       }
     };
     return () => source.close();

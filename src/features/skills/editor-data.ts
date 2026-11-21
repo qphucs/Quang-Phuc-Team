@@ -42,6 +42,7 @@ export async function loadEditorInitial(id: string) {
       videoFileId: skill.videoFileId,
       videoEmbedUrl: skill.videoEmbedUrl ?? undefined,
       capcutTemplateUrl: skill.capcutTemplateUrl ?? undefined,
+      levelId: skill.levelId,
       isRequired: skill.isRequired,
       steps: steps.map((s) => ({ title: s.title, body: s.body, mediaFileId: s.mediaFileId })),
       attachments: attachments.map((a) => ({ fileId: a.fileId, label: a.label })),

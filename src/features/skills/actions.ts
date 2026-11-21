@@ -1,6 +1,7 @@
 "use server";
 import { z } from "zod";
 import { action } from "@/lib/action";
+import { computeLevelStatus } from "@/lib/levels";
 import {
   deleteSkill,
   getPublishedSkillBySlug,
@@ -55,6 +56,12 @@ export const listAdminSkillsAction = action({
 });
 
 /* ----- Members (skill:read) ----- */
+
+export const getMyLevels = action({
+  schema: z.object({}),
+  permission: "skill:read",
+  handler: (_input, { user }) => computeLevelStatus(user.id),
+});
 
 export const listSkillsAction = action({
   schema: memberListSchema,

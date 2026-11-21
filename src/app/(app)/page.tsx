@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { COPY } from "@/lib/copy";
+import { HomeProgress } from "@/features/skills/components/home-progress";
 import { requireUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +33,9 @@ export default async function HomePage() {
       <section className="rounded-md bg-brand-tint p-4">
         <p className="text-sm text-body">{greeting()},</p>
         <h1 className="text-h2 font-semibold">{user.name}</h1>
-        <p className="mt-2 text-caption font-medium text-ink">Lộ trình học sẽ hiển thị ở đây từ Sprint 4.</p>
+        <div className="mt-3">
+          <HomeProgress />
+        </div>
       </section>
 
       <nav aria-label="Lối tắt" className="grid grid-cols-4 gap-2">

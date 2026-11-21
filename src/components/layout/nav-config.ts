@@ -1,4 +1,4 @@
-import { BookOpen, Download, House, TrendingUp, User, Users, type LucideIcon } from "lucide-react";
+import { BookOpen, Download, House, Layers, ListChecks, TrendingUp, User, Users, type LucideIcon } from "lucide-react";
 
 import type { Route } from "next";
 
@@ -16,6 +16,8 @@ export const MAIN_NAV: NavItem[] = [
 export const ADMIN_NAV: NavItem[] = [
   { href: "/quan-tri/thanh-vien", label: "Thành viên", icon: Users },
   { href: "/quan-tri/bai-hoc", label: "Bài học", icon: BookOpen },
+  { href: "/quan-tri/lo-trinh", label: "Lộ trình", icon: Layers },
+  { href: "/quan-tri/tien-do", label: "Tiến độ học", icon: ListChecks },
   { href: "/quan-tri/tai-xuong", label: "Nhật ký tải", icon: Download },
 ];
 
