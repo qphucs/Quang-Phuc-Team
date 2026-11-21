@@ -34,6 +34,7 @@
 | Lịch chạy (quét trend)        | **node-cron** trong tiến trình worker riêng                                        |                                                              |
 | Lưu file                      | Ổ đĩa local (dev) → **Cloudflare R2** (khi deploy, free 10GB)                      | Qua 1 lớp `storage` chung                                    |
 | Xử lý video/ảnh               | **ffmpeg** (tạo thumbnail), **sharp** (nén ảnh)                                    |                                                              |
+| Tạo file ZIP (tải cả bài ảnh) | **fflate** (nhẹ, không phụ thuộc, chạy trên Node)                                  |
 | Ngày giờ                      | **date-fns** + `date-fns-tz`                                                       |                                                              |
 | Kiểm thử                      | **Vitest** (logic) · **Playwright** (luồng chính)                                  |                                                              |
 | Chất lượng code               | **ESLint** + **Prettier** + **Husky** (chạy trước commit)                          |                                                              |
@@ -146,16 +147,16 @@ type Result<T> =
 
 ### 6.3 Mã lỗi (khóa — `src/lib/errors.ts`)
 
-| Mã                 | HTTP | Khi nào                               |
-| ------------------ | ---- | ------------------------------------- |
-| `VALIDATION_ERROR` | 400  | Dữ liệu không qua Zod                 |
-| `UNAUTHENTICATED`  | 401  | Chưa đăng nhập / hết phiên            |
-| `FORBIDDEN`        | 403  | Không đủ quyền                        |
-| `NOT_FOUND`        | 404  | Không tìm thấy                        |
-| `CONFLICT`         | 409  | Trùng (vd: tên đăng nhập đã có)       |
-| `RATE_LIMITED`     | 429  | Vượt giới hạn (vd: 50 lượt tải/ngày)  |
-| `UPSTREAM_ERROR`   | 502  | Nguồn ngoài lỗi (TikTok, nguồn trend) |
-| `INTERNAL_ERROR`   | 500  | Lỗi khác (ghi log đầy đủ ở server)    |
+| Mã                 | HTTP | Khi nào                                    |
+| ------------------ | ---- | ------------------------------------------ |
+| `VALIDATION_ERROR` | 400  | Dữ liệu không qua Zod                      |
+| `UNAUTHENTICATED`  | 401  | Chưa đăng nhập / hết phiên                 |
+| `FORBIDDEN`        | 403  | Không đủ quyền                             |
+| `NOT_FOUND`        | 404  | Không tìm thấy                             |
+| `CONFLICT`         | 409  | Trùng (vd: tên đăng nhập đã có)            |
+| `RATE_LIMITED`     | 429  | Vượt giới hạn (nếu có bật giới hạn tốc độ) |
+| `UPSTREAM_ERROR`   | 502  | Nguồn ngoài lỗi (TikTok, nguồn trend)      |
+| `INTERNAL_ERROR`   | 500  | Lỗi khác (ghi log đầy đủ ở server)         |
 
 ### 6.4 Danh sách & phân trang
 

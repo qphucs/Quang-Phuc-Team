@@ -4,8 +4,8 @@ import { db } from "@/db";
 import { downloads, users, type downloadKind } from "@/db/schema";
 import { AppError } from "@/lib/errors";
 import { buildFileName, isAllowedMediaUrl, normalizeTikTokUrl } from "./link";
-import { countTodayForUser, getDailyLimit } from "./quota";
 import { resolveCached, type MediaInfo } from "./provider";
+import { buildZip, type ZipEntry } from "./zip";
 
 export type Kind = (typeof downloadKind.enumValues)[number];
 
@@ -17,14 +17,15 @@ const MEDIA_HEADERS = {
 
 function requireTikTokUrl(input: string): string {
   const url = normalizeTikTokUrl(input);
-  if (!url)
+  if (!url) {
     throw new AppError("VALIDATION_ERROR", "Link không hợp lệ. Hãy dán link video TikTok.", {
       url: "Link không hợp lệ.",
     });
+  }
   return url;
 }
 
-/** Preview: title, author, cover and which downloads exist. No media is fetched or counted. */
+/** Preview: title, author, cover and which downloads exist. No media is fetched or logged. */
 export async function previewMedia(input: string) {
   const url = requireTikTokUrl(input);
   const info = await resolveCached(url);
@@ -67,42 +68,36 @@ async function logDownload(entry: {
   });
 }
 
-/**
- * Streams one file to the member. Order: quota → resolve → fetch media → log → stream.
- * The browser never sees the remote media URL, and only watermark-free media is ever returned.
- */
-export async function streamMedia(params: { userId: string; input: string; kind: Kind; index: number }) {
-  const url = requireTikTokUrl(params.input);
-
-  const [limit, used] = await Promise.all([getDailyLimit(), countTodayForUser(params.userId)]);
-  if (used >= limit) {
-    throw new AppError("RATE_LIMITED", `Bạn đã dùng hết ${limit} lượt tải hôm nay. Hãy quay lại vào ngày mai.`);
-  }
-
-  const info = await resolveCached(url);
-  const { remote, ext } = pickRemote(info, params.kind, params.index);
+/** Fetches one media file from the CDN. Throws UPSTREAM_ERROR for anything unexpected. */
+async function fetchRemote(remote: string): Promise<Response> {
   if (!isAllowedMediaUrl(remote)) throw new AppError("UPSTREAM_ERROR", "Nguồn trả về một liên kết không an toàn.");
-
-  let upstream: Response;
+  let response: Response;
   try {
-    upstream = await fetch(remote, {
+    response = await fetch(remote, {
       headers: MEDIA_HEADERS,
       redirect: "follow",
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
   } catch {
-    await logDownload({
-      userId: params.userId,
-      sourceUrl: url,
-      kind: params.kind,
-      title: info.title,
-      author: info.author,
-      status: "failed",
-      error: "fetch",
-    });
     throw new AppError("UPSTREAM_ERROR");
   }
-  if (!upstream.ok || !upstream.body) {
+  if (!response.ok || !response.body) throw new AppError("UPSTREAM_ERROR");
+  return response;
+}
+
+/**
+ * Streams one file to the member. Order: resolve → pick watermark-free media → fetch → log → stream.
+ * The browser never sees the remote media URL, and only watermark-free media is ever returned.
+ */
+export async function streamMedia(params: { userId: string; input: string; kind: Kind; index: number }) {
+  const url = requireTikTokUrl(params.input);
+  const info = await resolveCached(url);
+  const { remote, ext } = pickRemote(info, params.kind, params.index);
+
+  let upstream: Response;
+  try {
+    upstream = await fetchRemote(remote);
+  } catch (error) {
     await logDownload({
       userId: params.userId,
       sourceUrl: url,
@@ -110,9 +105,9 @@ export async function streamMedia(params: { userId: string; input: string; kind:
       title: info.title,
       author: info.author,
       status: "failed",
-      error: `http ${upstream.status}`,
+      error: error instanceof AppError ? error.code : "fetch",
     });
-    throw new AppError("UPSTREAM_ERROR");
+    throw error;
   }
 
   const fileName = buildFileName(
@@ -129,10 +124,57 @@ export async function streamMedia(params: { userId: string; input: string; kind:
   });
 
   return {
-    body: upstream.body,
+    body: upstream.body!,
     contentType: upstream.headers.get("content-type") ?? "application/octet-stream",
     contentLength: upstream.headers.get("content-length"),
     fileName,
+  };
+}
+
+/**
+ * Downloads every image of a slideshow post as one ZIP.
+ * All images are fetched first, so a failure returns a clear error instead of a broken archive.
+ */
+export async function buildImagesZip(params: { userId: string; input: string }) {
+  const url = requireTikTokUrl(params.input);
+  const info = await resolveCached(url);
+  if (info.images.length === 0) throw new AppError("NOT_FOUND", "Link này không phải bài ảnh.");
+
+  const entries: ZipEntry[] = [];
+  try {
+    for (const [index, remote] of info.images.entries()) {
+      const response = await fetchRemote(remote);
+      entries.push({
+        name: buildFileName({ author: info.author, title: info.title, index }, "jpg"),
+        data: new Uint8Array(await response.arrayBuffer()),
+      });
+    }
+  } catch (error) {
+    await logDownload({
+      userId: params.userId,
+      sourceUrl: url,
+      kind: "image",
+      title: info.title,
+      author: info.author,
+      status: "failed",
+      error: error instanceof AppError ? error.code : "fetch",
+    });
+    throw error;
+  }
+
+  const archive = buildZip(entries);
+  await logDownload({
+    userId: params.userId,
+    sourceUrl: url,
+    kind: "image",
+    title: info.title,
+    author: info.author,
+    status: "ok",
+  });
+
+  return {
+    body: archive,
+    fileName: buildFileName({ author: info.author, title: info.title }, "zip"),
   };
 }
 

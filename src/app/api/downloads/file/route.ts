@@ -1,4 +1,4 @@
-import { streamMedia } from "@/features/downloader/service";
+import { buildImagesZip, streamMedia } from "@/features/downloader/service";
 import { fileQuerySchema } from "@/features/downloader/schemas";
 import { AppError, ERROR_CODES } from "@/lib/errors";
 import { can } from "@/lib/permissions";
@@ -19,7 +19,7 @@ function attachment(name: string): string {
   return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(name)}`;
 }
 
-/** Streams a watermark-free file to a signed-in member, after checking quota and permission. */
+/** Sends a watermark-free file (or a ZIP of slideshow images) to a signed-in member. */
 export async function GET(request: Request) {
   const session = await getSession();
   if (!session) return jsonError("UNAUTHENTICATED");
@@ -34,6 +34,19 @@ export async function GET(request: Request) {
   if (!parsed.success) return jsonError("VALIDATION_ERROR", "Yêu cầu tải không hợp lệ.");
 
   try {
+    if (parsed.data.kind === "zip") {
+      const zip = await buildImagesZip({ userId: session.user.id, input: parsed.data.url });
+      return new Response(zip.body as BodyInit, {
+        headers: {
+          "Content-Type": "application/zip",
+          "Content-Disposition": attachment(zip.fileName),
+          "Content-Length": String(zip.body.byteLength),
+          "Cache-Control": "private, no-store",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
+
     const file = await streamMedia({
       userId: session.user.id,
       input: parsed.data.url,

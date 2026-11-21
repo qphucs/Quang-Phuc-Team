@@ -79,7 +79,7 @@ Cách hoạt động:
 ### M5. Tải TikTok không logo
 
 - Dán link → xem trước → tải **video không logo (MP4)**, **ảnh slideshow (từng ảnh / zip)**, **âm thanh (MP3)**.
-- Chỉ người đã đăng nhập. Giới hạn mặc định 50 lượt/người/ngày (admin chỉnh được).
+- Chỉ người đã đăng nhập. **Không giới hạn số lượt** (quyết định 2026-11-22, chủ team chọn để team tải thoải mái). Tải được video, nhạc, từng ảnh và tải cả bài ảnh (slideshow) dưới dạng ZIP.
 - Lịch sử tải của mình; admin xem log toàn team.
 - Dùng nguồn **miễn phí** trước; thiết kế sẵn để đổi sang API trả phí sau mà không sửa giao diện.
 
