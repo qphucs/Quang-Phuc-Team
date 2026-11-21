@@ -1,0 +1,7 @@
+node_modules
+.next
+pnpm-lock.yaml
+src/db/migrations
+storage
+docs/design-preview.html
+AGENTS.md
