@@ -1,4 +1,4 @@
-import { BookOpen, Download, House, LayoutDashboard, TrendingUp, User, type LucideIcon } from "lucide-react";
+import { BookOpen, Download, House, TrendingUp, User, Users, type LucideIcon } from "lucide-react";
 import type { Route } from "next";
 
 export type NavItem = { href: Route; label: string; icon: LucideIcon };
@@ -12,7 +12,7 @@ export const MAIN_NAV: NavItem[] = [
   { href: "/toi", label: "Tôi", icon: User },
 ];
 
-export const ADMIN_NAV: NavItem[] = [{ href: "/quan-tri", label: "Tổng quan", icon: LayoutDashboard }];
+export const ADMIN_NAV: NavItem[] = [{ href: "/quan-tri/thanh-vien", label: "Thành viên", icon: Users }];
 
 export function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);

@@ -15,7 +15,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "seed": "tsx --conditions=react-server --env-file=.env scripts/seed.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "seed:members": "tsx --conditions=react-server --env-file=.env scripts/seed-test-members.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.7",

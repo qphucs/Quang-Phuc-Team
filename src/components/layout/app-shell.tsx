@@ -2,6 +2,7 @@ import { Bell } from "lucide-react";
 import type { ReactNode } from "react";
 import { APP_NAME } from "@/lib/copy";
 import { BottomNav } from "./bottom-nav";
+import { RealtimeBridge } from "./realtime-bridge";
 import { Sidebar } from "./sidebar";
 
 export type ShellUser = { name: string; image?: string | null; roleLabel: string };
@@ -25,6 +26,7 @@ export function AppShell({ user, isAdmin, children }: { user: ShellUser; isAdmin
         <div className="mx-auto w-full max-w-[1200px] px-4 pt-4 md:px-6 lg:pt-8">{children}</div>
       </main>
       <BottomNav />
+      <RealtimeBridge />
     </div>
   );
 }

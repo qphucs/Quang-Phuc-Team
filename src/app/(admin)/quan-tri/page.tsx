@@ -1,16 +1,6 @@
-import { Users } from "lucide-react";
-import type { Metadata } from "next";
-import { ComingSoon } from "@/components/layout/coming-soon";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Quản trị" };
-
+// Sprint 1: the admin home is the member list. Later sprints add a dashboard here.
 export default function AdminHomePage() {
-  return (
-    <ComingSoon
-      title="Quản trị"
-      description="Quản lý thành viên, skill, trend và nhật ký hoạt động."
-      icon={Users}
-      sprint={1}
-    />
-  );
+  redirect("/quan-tri/thanh-vien");
 }

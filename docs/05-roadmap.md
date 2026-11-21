@@ -40,12 +40,12 @@
 
 ## Sprint 1 — Thành viên & Admin
 
-- [ ] Bảng `users`, `tiktok_channels`, `audit_logs`, `settings`
-- [ ] Admin: danh sách thành viên (tìm, lọc trạng thái), tạo tài khoản (sinh mật khẩu tạm), sửa, khóa/mở, reset mật khẩu, đổi vai trò (owner)
-- [ ] Hồ sơ thành viên: thông tin cơ bản, nhiều kênh TikTok, ghi chú admin
-- [ ] Trang "Tôi": sửa hồ sơ, avatar, đổi mật khẩu
-- [ ] SSE `/api/events` + trạng thái online + danh sách thành viên cập nhật realtime
-- [ ] Upload ảnh avatar qua `lib/storage` (local)
+- [x] Bảng `users`, `tiktok_channels`, `audit_logs`, `settings`
+- [x] Admin: danh sách thành viên (tìm, lọc trạng thái), tạo tài khoản (sinh mật khẩu tạm), sửa, khóa/mở, reset mật khẩu, đổi vai trò (owner)
+- [x] Hồ sơ thành viên: thông tin cơ bản, nhiều kênh TikTok, ghi chú admin
+- [x] Trang "Tôi": sửa hồ sơ, đổi mật khẩu (avatar chuyển sang Sprint 6)
+- [x] SSE `/api/events` + trạng thái online + danh sách thành viên cập nhật realtime
+- [ ] Upload ảnh avatar qua `lib/storage` (local) — hoãn sang Sprint 6
 
 **Xong khi:** admin tạo tài khoản trên máy tính → member đăng nhập trên điện thoại → admin thấy member "đang online" không cần F5.
 

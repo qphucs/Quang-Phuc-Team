@@ -8,6 +8,13 @@
       "when": 1795277949685,
       "tag": "0000_broken_nitro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795279487003,
+      "tag": "0001_silent_boom_boom",
+      "breakpoints": true
     }
   ]
 }

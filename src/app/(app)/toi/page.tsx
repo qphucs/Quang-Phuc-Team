@@ -1,13 +1,12 @@
-import { ChevronRight, KeyRound, LayoutDashboard } from "lucide-react";
+import { KeyRound, LayoutDashboard, ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
-import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { MyChannels } from "@/features/profile/components/my-channels";
+import { ProfileCard } from "@/features/profile/components/profile-card";
 import { SignOutButton } from "@/features/auth/components/sign-out-button";
 import { COPY } from "@/lib/copy";
-import { formatDate } from "@/lib/format";
 import { can, isRole, ROLE_LABELS } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 
@@ -17,20 +16,20 @@ const rowClass = "flex h-14 items-center gap-3 px-4 text-ink active:bg-surface";
 
 export default async function MePage() {
   const user = await requireUser();
+  const roleLabel = isRole(user.role) ? ROLE_LABELS[user.role] : "";
   return (
     <div className="flex flex-col gap-4">
       <PageHeader title="Tôi" />
-      <Card className="flex items-center gap-4">
-        <Avatar name={user.name} src={user.image} size={64} />
-        <div className="min-w-0">
-          <p className="truncate text-h3 font-semibold text-ink">{user.name}</p>
-          <p className="truncate text-sm text-muted">@{user.username}</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {isRole(user.role) ? <Badge variant="brand">{ROLE_LABELS[user.role]}</Badge> : null}
-            <Badge>Tham gia {formatDate(user.createdAt)}</Badge>
-          </div>
-        </div>
-      </Card>
+      <ProfileCard
+        name={user.name}
+        username={user.username ?? ""}
+        phone={user.phone ?? null}
+        image={user.image ?? null}
+        roleLabel={roleLabel}
+        joinedAt={user.createdAt}
+      />
+
+      <MyChannels />
 
       <Card className="divide-y divide-line p-0">
         <Link href="/doi-mat-khau" className={rowClass}>
