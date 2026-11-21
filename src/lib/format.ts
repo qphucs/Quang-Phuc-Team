@@ -1,7 +1,8 @@
 /** Display formats — docs/02-design-system.md §8. Always store UTC, display GMT+7. */
 import { differenceInCalendarDays, formatDistanceToNowStrict } from "date-fns";
 import { vi } from "date-fns/locale";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
+import { startOfDay } from "date-fns";
 
 export const APP_TIME_ZONE = "Asia/Ho_Chi_Minh";
 
@@ -45,4 +46,9 @@ export function formatCompact(n: number): string {
     }
   }
   return thousands.format(n);
+}
+
+/** Start of "today" in Vietnam time, as a UTC instant. Used for "hôm nay" filters. */
+export function startOfTodayInVietnam(now: Date = new Date()): Date {
+  return fromZonedTime(startOfDay(toZonedTime(now, APP_TIME_ZONE)), APP_TIME_ZONE);
 }

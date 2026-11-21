@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildFileName, isAllowedMediaUrl, normalizeTikTokUrl } from "./link";
+import { buildFileName, isAllowedMediaUrl, normalizeTikTokUrl } from "@/lib/tiktok-link";
 
 describe("normalizeTikTokUrl", () => {
   it("accepts TikTok links on any tiktok.com subdomain", () => {

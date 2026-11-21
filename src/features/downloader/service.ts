@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { downloads, users, type downloadKind } from "@/db/schema";
 import { AppError } from "@/lib/errors";
-import { buildFileName, isAllowedMediaUrl, normalizeTikTokUrl } from "./link";
+import { buildFileName, isAllowedMediaUrl, normalizeTikTokUrl } from "@/lib/tiktok-link";
 import { resolveCached, type MediaInfo } from "./provider";
 import { buildZip, type ZipEntry } from "./zip";
 

@@ -271,6 +271,76 @@ export const learningProgress = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.skillId] })],
 );
 
+/* ---------- Trend radar (Sprint 5) ---------- */
+
+export const trendType = pgEnum("trend_type", ["capcut_edit", "sound"]);
+export const trendStatus = pgEnum("trend_status", ["pending", "published", "rejected"]);
+
+export const trendItems = pgTable(
+  "trend_items",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    type: trendType().notNull(),
+    source: text().notNull(),
+    url: text().notNull().unique(),
+    title: text().notNull().default(""),
+    coverUrl: text(),
+    author: text().notNull().default(""),
+    soundName: text(),
+    viewCount: integer(),
+    useCount: integer(),
+    heatScore: integer().notNull().default(0),
+    status: trendStatus().notNull().default("pending"),
+    isPinned: boolean().notNull().default(false),
+    note: text().notNull().default(""),
+    skillId: uuid().references(() => skills.id, { onDelete: "set null" }),
+    addedBy: uuid().references(() => users.id, { onDelete: "set null" }),
+    firstSeenAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    publishedAt: timestamp({ withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index("trend_items_type_status_idx").on(t.type, t.status, t.firstSeenAt)],
+);
+
+export const trendSnapshots = pgTable(
+  "trend_snapshots",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    trendId: uuid()
+      .notNull()
+      .references(() => trendItems.id, { onDelete: "cascade" }),
+    viewCount: integer(),
+    useCount: integer(),
+    capturedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("trend_snapshots_trend_idx").on(t.trendId, t.capturedAt)],
+);
+
+export const trendRuns = pgTable("trend_runs", {
+  id: uuid().primaryKey().defaultRandom(),
+  source: text().notNull(),
+  startedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  finishedAt: timestamp({ withTimezone: true }),
+  ok: boolean().notNull().default(false),
+  foundCount: integer().notNull().default(0),
+  newCount: integer().notNull().default(0),
+  error: text(),
+});
+
+export const savedTrends = pgTable(
+  "saved_trends",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    trendId: uuid()
+      .notNull()
+      .references(() => trendItems.id, { onDelete: "cascade" }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.trendId] })],
+);
+
 export const settings = pgTable("settings", {
   key: text().primaryKey(),
   value: jsonb().notNull(),

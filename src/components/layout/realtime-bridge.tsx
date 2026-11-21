@@ -29,6 +29,10 @@ export function RealtimeBridge() {
         void queryClient.invalidateQueries({ queryKey: ["skill"] });
         void queryClient.invalidateQueries({ queryKey: ["skills-admin"] });
       }
+      if (type.startsWith("trend.")) {
+        void queryClient.invalidateQueries({ queryKey: ["trends"] });
+        void queryClient.invalidateQueries({ queryKey: ["trend-queue"] });
+      }
       if (type.startsWith("learning.")) {
         void queryClient.invalidateQueries({ queryKey: ["my-learning"] });
         void queryClient.invalidateQueries({ queryKey: ["learning-matrix"] });

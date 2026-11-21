@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "next typegen \u0026\u0026 tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
@@ -16,7 +16,8 @@
     "db:studio": "drizzle-kit studio",
     "seed": "tsx --conditions=react-server --env-file=.env scripts/seed.ts",
     "prepare": "husky",
-    "seed:members": "tsx --conditions=react-server --env-file=.env scripts/seed-test-members.ts"
+    "seed:members": "tsx --conditions=react-server --env-file=.env scripts/seed-test-members.ts",
+    "worker": "tsx --conditions=react-server --env-file=.env worker/index.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.7",
@@ -31,6 +32,7 @@
     "fflate": "^0.8.3",
     "lucide-react": "^1.77.0",
     "next": "16.4.6",
+    "node-cron": "^4.6.0",
     "pg": "^8.23.1",
     "radix-ui": "^1.8.1",
     "react": "19.3.0",
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "^20",
+    "@types/node-cron": "^3.0.11",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",

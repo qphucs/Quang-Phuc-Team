@@ -1,7 +1,7 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardPaste, Clock, Download, FileArchive, ImageOff, Music, Video } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,9 +25,9 @@ function formatDuration(sec: number | null) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-export function Downloader() {
+export function Downloader({ initialUrl = "" }: { initialUrl?: string }) {
   const queryClient = useQueryClient();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initialUrl);
   const [preview, setPreview] = useState<MediaPreview | null>(null);
 
   const history = useQuery({
@@ -43,6 +43,12 @@ export function Downloader() {
       toast.error(error.message);
     },
   });
+
+  // Opened from a trend card: preview the link straight away.
+  useEffect(() => {
+    if (initialUrl) previewMutation.mutate(initialUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
+  }, []);
 
   const refreshAfterDownload = () => {
     // The server logs the download when the file starts streaming; refresh history shortly after.

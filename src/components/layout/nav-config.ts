@@ -18,6 +18,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/quan-tri/bai-hoc", label: "Bài học", icon: BookOpen },
   { href: "/quan-tri/lo-trinh", label: "Lộ trình", icon: Layers },
   { href: "/quan-tri/tien-do", label: "Tiến độ học", icon: ListChecks },
+  { href: "/quan-tri/trend", label: "Duyệt trend", icon: TrendingUp },
   { href: "/quan-tri/tai-xuong", label: "Nhật ký tải", icon: Download },
 ];
 

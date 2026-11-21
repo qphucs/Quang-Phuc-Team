@@ -81,12 +81,12 @@
 
 ## Sprint 5 — Radar Trend
 
-- [ ] Bảng `trend_items`, `trend_snapshots`, `trend_runs`
-- [ ] Worker + node-cron (06:00 & 18:00, chỉnh trong settings) + nút "Quét ngay" cho admin
-- [ ] Adapter nhạc thịnh hành VN + adapter video edit CapCut theo hashtag
-- [ ] Tính điểm nóng, hàng chờ duyệt, tự đăng (bật/tắt)
-- [ ] Admin: duyệt nhanh, ghim, gắn bài skill "cách làm", thêm trend thủ công, xem tình trạng nguồn
-- [ ] Member: feed trend (CapCut/Nhạc/Đã lưu), lọc thời gian, lưu, tải video trend bằng module Sprint 2
+- [x] Bảng `trend_items`, `trend_snapshots`, `trend_runs`
+- [x] Worker + node-cron (06:00 & 18:00, chỉnh trong settings) + nút "Quét ngay" cho admin
+- [x] Adapter nhạc thịnh hành VN + adapter video edit CapCut theo hashtag
+- [x] Tính điểm nóng, hàng chờ duyệt, tự đăng (bật/tắt)
+- [x] Admin: duyệt nhanh, ghim, gắn bài skill "cách làm", thêm trend thủ công, xem tình trạng nguồn
+- [x] Member: feed trend (CapCut/Nhạc/Đã lưu), lọc thời gian, lưu, tải video trend bằng module Sprint 2
 
 **Xong khi:** sáng ra mở admin có ≥ 5 trend mới trong hàng chờ mà không ai nhập tay.
 
