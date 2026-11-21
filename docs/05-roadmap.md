@@ -62,11 +62,11 @@
 
 ## Sprint 3 — Thư viện Skill
 
-- [ ] Bảng `files`, `skills`, `skill_steps`, `skill_attachments`
-- [ ] Upload video/ảnh/tài liệu (giới hạn dung lượng, kiểm tra định dạng), worker tạo thumbnail video
-- [ ] Video: chọn **upload** hoặc **dán link nhúng** YouTube/TikTok
-- [ ] Trình soạn bài cho admin: thông tin, các bước (thêm/xóa/kéo thả), tài liệu, nháp/đăng
-- [ ] Member: danh sách bài (tìm, lọc tag/độ khó), chi tiết bài, lưu bài, tải tài liệu
+- [x] Bảng `files`, `skills`, `skill_steps`, `skill_attachments`
+- [x] Upload video/ảnh/tài liệu (giới hạn dung lượng, kiểm tra định dạng), worker tạo thumbnail video
+- [x] Video: chọn **upload** hoặc **dán link nhúng** YouTube/TikTok
+- [x] Trình soạn bài cho admin: thông tin, các bước (thêm/xóa/kéo thả), tài liệu, nháp/đăng
+- [x] Member: danh sách bài (tìm, lọc tag/độ khó), chi tiết bài, lưu bài, tải tài liệu
 
 **Xong khi:** admin đăng 1 bài có video + 3 bước trong < 5 phút, member xem mượt trên điện thoại.
 

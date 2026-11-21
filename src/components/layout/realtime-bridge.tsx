@@ -24,6 +24,15 @@ export function RealtimeBridge() {
         void queryClient.invalidateQueries({ queryKey: ["members"] });
         void queryClient.invalidateQueries({ queryKey: ["member"] });
       }
+      if (type.startsWith("skill.")) {
+        void queryClient.invalidateQueries({ queryKey: ["skills"] });
+        void queryClient.invalidateQueries({ queryKey: ["skill"] });
+        void queryClient.invalidateQueries({ queryKey: ["skills-admin"] });
+      }
+      if (type.startsWith("learning.")) {
+        void queryClient.invalidateQueries({ queryKey: ["my-learning"] });
+        void queryClient.invalidateQueries({ queryKey: ["learning-matrix"] });
+      }
     };
     return () => source.close();
   }, [queryClient]);

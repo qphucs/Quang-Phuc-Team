@@ -3,7 +3,19 @@
  * TS keys are camelCase; columns become snake_case via `casing: "snake_case"`.
  * Change the schema only through migrations: `pnpm db:generate` → `pnpm db:migrate`.
  */
-import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 const timestamps = {
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -151,6 +163,112 @@ export const downloads = pgTable(
     index("downloads_user_created_idx").on(t.userId, t.createdAt),
     index("downloads_created_idx").on(t.createdAt),
   ],
+);
+
+/* ---------- Skill library (Sprint 3) & learning path (Sprint 4) ---------- */
+
+export const fileKind = pgEnum("file_kind", ["image", "video", "document"]);
+export const skillStatus = pgEnum("skill_status", ["draft", "published"]);
+export const skillDifficulty = pgEnum("skill_difficulty", ["basic", "intermediate", "advanced"]);
+export const skillVideoKind = pgEnum("skill_video_kind", ["upload", "embed"]);
+export const learningStatus = pgEnum("learning_status", ["saved", "completed"]);
+
+export const files = pgTable(
+  "files",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    kind: fileKind().notNull(),
+    mime: text().notNull(),
+    sizeBytes: integer().notNull(),
+    storageKey: text().notNull().unique(),
+    originalName: text().notNull(),
+    uploadedBy: uuid().references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("files_uploaded_by_idx").on(t.uploadedBy)],
+);
+
+export const levels = pgTable("levels", {
+  id: uuid().primaryKey().defaultRandom(),
+  number: integer().notNull().unique(),
+  name: text().notNull(),
+  description: text().notNull().default(""),
+  sortOrder: integer().notNull().default(0),
+  ...timestamps,
+});
+
+export const skills = pgTable(
+  "skills",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    slug: text().notNull().unique(),
+    title: text().notNull(),
+    summary: text().notNull().default(""),
+    coverFileId: uuid().references(() => files.id, { onDelete: "set null" }),
+    videoKind: skillVideoKind(),
+    videoFileId: uuid().references(() => files.id, { onDelete: "set null" }),
+    videoEmbedUrl: text(),
+    difficulty: skillDifficulty().notNull().default("basic"),
+    durationMin: integer().notNull().default(0),
+    levelId: uuid().references(() => levels.id, { onDelete: "set null" }),
+    isRequired: boolean().notNull().default(false),
+    capcutTemplateUrl: text(),
+    tags: text().array().notNull().default([]),
+    status: skillStatus().notNull().default("draft"),
+    authorId: uuid().references(() => users.id, { onDelete: "set null" }),
+    publishedAt: timestamp({ withTimezone: true }),
+    deletedAt: timestamp({ withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index("skills_status_idx").on(t.status), index("skills_level_idx").on(t.levelId)],
+);
+
+export const skillSteps = pgTable(
+  "skill_steps",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    skillId: uuid()
+      .notNull()
+      .references(() => skills.id, { onDelete: "cascade" }),
+    position: integer().notNull(),
+    title: text().notNull(),
+    body: text().notNull().default(""),
+    mediaFileId: uuid().references(() => files.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [index("skill_steps_skill_idx").on(t.skillId, t.position)],
+);
+
+export const skillAttachments = pgTable(
+  "skill_attachments",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    skillId: uuid()
+      .notNull()
+      .references(() => skills.id, { onDelete: "cascade" }),
+    fileId: uuid()
+      .notNull()
+      .references(() => files.id, { onDelete: "cascade" }),
+    label: text().notNull(),
+    ...timestamps,
+  },
+  (t) => [index("skill_attachments_skill_idx").on(t.skillId)],
+);
+
+export const learningProgress = pgTable(
+  "learning_progress",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    skillId: uuid()
+      .notNull()
+      .references(() => skills.id, { onDelete: "cascade" }),
+    status: learningStatus().notNull(),
+    completedAt: timestamp({ withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.skillId] })],
 );
 
 export const settings = pgTable("settings", {

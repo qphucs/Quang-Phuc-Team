@@ -15,6 +15,7 @@ export const MAIN_NAV: NavItem[] = [
 
 export const ADMIN_NAV: NavItem[] = [
   { href: "/quan-tri/thanh-vien", label: "Thành viên", icon: Users },
+  { href: "/quan-tri/bai-hoc", label: "Bài học", icon: BookOpen },
   { href: "/quan-tri/tai-xuong", label: "Nhật ký tải", icon: Download },
 ];
 
