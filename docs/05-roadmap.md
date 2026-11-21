@@ -51,11 +51,12 @@
 
 ## Sprint 2 — Tải TikTok không logo
 
-- [ ] Provider `free` + interface để đổi `paid` sau
-- [ ] Trang Tải: dán link (nút "Dán" đọc clipboard), xem trước, tải video MP4 / ảnh (từng ảnh + zip) / MP3
-- [ ] Server proxy file, tên file `tacgia_mota_ngay.mp4`
-- [ ] Giới hạn lượt/ngày (đọc từ `settings`), lịch sử tải cá nhân, log toàn team cho admin
-- [ ] Xử lý lỗi rõ ràng: link sai, video riêng tư, nguồn lỗi
+- [x] Provider `free` + interface để đổi `paid` sau
+- [x] Trang Tải: dán link (nút "Dán" đọc clipboard), xem trước, tải video MP4 / nhạc MP3 / từng ảnh (zip để sau)
+- [x] Server proxy file, tên file `tacgia - tieude.mp4`
+- [x] Giới hạn lượt/ngày (đọc từ `settings`, mặc định 50), lịch sử tải cá nhân, log toàn team cho admin
+- [x] Xử lý lỗi rõ ràng: link sai, video riêng tư, nguồn lỗi
+- [ ] Tải nhiều ảnh cùng lúc (zip) — hoãn
 
 **Xong khi:** từ điện thoại dán link TikTok → có file video không logo trong máy < 10 giây.
 

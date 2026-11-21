@@ -129,6 +129,30 @@ export const auditLogs = pgTable(
   ],
 );
 
+export const downloadKind = pgEnum("download_kind", ["video", "audio", "image"]);
+export const downloadStatus = pgEnum("download_status", ["ok", "failed"]);
+
+export const downloads = pgTable(
+  "downloads",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sourceUrl: text().notNull(),
+    kind: downloadKind().notNull(),
+    title: text().notNull().default(""),
+    author: text().notNull().default(""),
+    status: downloadStatus().notNull(),
+    error: text(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("downloads_user_created_idx").on(t.userId, t.createdAt),
+    index("downloads_created_idx").on(t.createdAt),
+  ],
+);
+
 export const settings = pgTable("settings", {
   key: text().primaryKey(),
   value: jsonb().notNull(),
