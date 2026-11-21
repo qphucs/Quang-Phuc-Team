@@ -1,6 +1,10 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import { DashboardView } from "@/features/dashboard/components/dashboard-view";
+import { requirePermission } from "@/lib/session";
 
-// Sprint 1: the admin home is the member list. Later sprints add a dashboard here.
-export default function AdminHomePage() {
-  redirect("/quan-tri/thanh-vien");
+export const metadata: Metadata = { title: "Tổng quan" };
+
+export default async function AdminHomePage() {
+  await requirePermission("member:manage");
+  return <DashboardView />;
 }

@@ -9,7 +9,11 @@ export async function SignedInShell({ permission, children }: { permission?: Per
   const user = permission ? await requirePermission(permission) : await requireUser();
   const roleLabel = isRole(user.role) ? ROLE_LABELS[user.role] : "";
   return (
-    <AppShell user={{ name: user.name, image: user.image, roleLabel }} isAdmin={can(user, "member:manage")}>
+    <AppShell
+      user={{ name: user.name, image: user.image, roleLabel }}
+      isAdmin={can(user, "member:manage")}
+      isOwner={user.role === "owner"}
+    >
       {children}
     </AppShell>
   );

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Avatar } from "@/components/ui/avatar";
 import { APP_NAME, COPY } from "@/lib/copy";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { ADMIN_NAV, isActive, MAIN_NAV, type NavItem } from "./nav-config";
 import type { ShellUser } from "./app-shell";
 
@@ -25,7 +26,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   );
 }
 
-export function Sidebar({ user, isAdmin }: { user: ShellUser; isAdmin: boolean }) {
+export function Sidebar({ user, isAdmin, isOwner }: { user: ShellUser; isAdmin: boolean; isOwner: boolean }) {
   const pathname = usePathname();
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-line bg-white lg:flex">
@@ -34,6 +35,9 @@ export function Sidebar({ user, isAdmin }: { user: ShellUser; isAdmin: boolean }
           QP
         </span>
         <span className="font-bold text-ink">{APP_NAME}</span>
+        <div className="ml-auto">
+          <NotificationBell />
+        </div>
       </div>
       <nav aria-label="Điều hướng chính" className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
         {MAIN_NAV.map((item) => (
@@ -42,7 +46,7 @@ export function Sidebar({ user, isAdmin }: { user: ShellUser; isAdmin: boolean }
         {isAdmin ? (
           <>
             <p className="mt-6 mb-1 px-3 text-caption font-medium text-muted">{COPY.admin}</p>
-            {ADMIN_NAV.map((item) => (
+            {ADMIN_NAV.filter((item) => !item.ownerOnly || isOwner).map((item) => (
               <NavLink key={item.href} item={item} pathname={pathname} />
             ))}
           </>

@@ -12,7 +12,10 @@ import { toast } from "@/components/ui/toaster";
 import { formatDate } from "@/lib/format";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateOwnProfile } from "../actions";
+import { setMyAvatar, updateOwnProfile } from "../actions";
+import { uploadFile } from "@/features/skills/components/file-upload";
+import { useRouter } from "next/navigation";
+import { ImagePlus } from "lucide-react";
 import { updateOwnProfileSchema, type UpdateOwnProfileInput } from "../schemas";
 
 type Props = {
@@ -26,7 +29,9 @@ type Props = {
 
 export function ProfileCard({ name, username, phone, image, roleLabel, joinedAt }: Props) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   return (
     <Card className="flex flex-col gap-4">
@@ -45,10 +50,40 @@ export function ProfileCard({ name, username, phone, image, roleLabel, joinedAt 
         <dt className="text-muted">Số điện thoại</dt>
         <dd className="text-ink">{phone ?? "Chưa có"}</dd>
       </dl>
-      <Button variant="secondary" onClick={() => setOpen(true)}>
-        <Pencil aria-hidden />
-        Sửa hồ sơ
-      </Button>
+      <div className="grid grid-cols-2 gap-2">
+        <Button asChild variant="secondary" loading={uploading}>
+          <label className="cursor-pointer">
+            <ImagePlus aria-hidden />
+            Đổi ảnh
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setUploading(true);
+                try {
+                  const uploaded = await uploadFile(file, "avatar");
+                  const result = await setMyAvatar({ fileId: uploaded.id });
+                  if (!result.ok) throw new Error(result.error.message);
+                  toast.success("Đã đổi ảnh đại diện.");
+                  router.refresh();
+                } catch (error) {
+                  toast.error(error instanceof Error ? error.message : "Không đổi được ảnh. Hãy thử lại.");
+                } finally {
+                  setUploading(false);
+                  e.target.value = "";
+                }
+              }}
+            />
+          </label>
+        </Button>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          <Pencil aria-hidden />
+          Sửa hồ sơ
+        </Button>
+      </div>
 
       <Sheet open={open} onOpenChange={setOpen} title="Sửa hồ sơ">
         <EditProfileForm

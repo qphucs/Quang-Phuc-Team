@@ -6,6 +6,8 @@ import { writeAudit } from "@/lib/audit";
 import { AppError } from "@/lib/errors";
 import { startOfTodayInVietnam } from "@/lib/format";
 import { emit } from "@/lib/realtime";
+import { notifyActiveMembers } from "@/lib/notify";
+import { getBooleanSetting, SETTING_KEYS } from "@/lib/settings";
 import { normalizeTikTokUrl } from "@/lib/tiktok-link";
 import { heatScore } from "./heat";
 import { fetchOembed } from "./oembed";
@@ -51,21 +53,33 @@ export async function addManualTrend(
 }
 
 export async function setTrendStatus(actor: { id: string }, id: string, status: "published" | "rejected" | "pending") {
-  const result = await db
+  const [before] = await db
+    .select({ status: trendItems.status, title: trendItems.title })
+    .from(trendItems)
+    .where(eq(trendItems.id, id))
+    .limit(1);
+  if (!before) throw new AppError("NOT_FOUND");
+  await db
     .update(trendItems)
     .set({
       status,
       publishedAt: status === "published" ? new Date() : null,
       updatedAt: new Date(),
     })
-    .where(eq(trendItems.id, id))
-    .returning({ id: trendItems.id });
-  if (result.length === 0) throw new AppError("NOT_FOUND");
+    .where(eq(trendItems.id, id));
   await writeAudit({ actorId: actor.id, action: `trend.${status}`, targetType: "trend", targetId: id });
+  if (status === "published" && before.status !== "published") {
+    await notifyActiveMembers({
+      type: "trend.published",
+      title: "Trend mới hôm nay",
+      body: before.title || "Có trend mới được đội ngũ chọn",
+      link: "/trend",
+      exceptUserId: actor.id,
+    });
+  }
   await emit("trend.updated", { id });
   return { id, status };
 }
-
 export async function setTrendPinned(actor: { id: string }, id: string, pinned: boolean) {
   const result = await db
     .update(trendItems)
@@ -161,6 +175,7 @@ export async function toggleSavedTrend(userId: string, trendId: string) {
  */
 export async function runScan(now: Date = new Date()) {
   const results: { source: string; ok: boolean; found: number; created: number }[] = [];
+  const autoPublish = await getBooleanSetting(SETTING_KEYS.trendAutoPublish);
   for (const source of TREND_SOURCES) {
     const [run] = await db
       .insert(trendRuns)
@@ -197,6 +212,8 @@ export async function runScan(now: Date = new Date()) {
               viewCount: item.viewCount,
               useCount: item.useCount,
               firstSeenAt: now,
+              status: autoPublish ? "published" : "pending",
+              publishedAt: autoPublish ? now : null,
             })
             .returning({ id: trendItems.id });
           trendId = row.id;

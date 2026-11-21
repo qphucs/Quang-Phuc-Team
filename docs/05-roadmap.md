@@ -92,12 +92,12 @@
 
 ## Sprint 6 — Hoàn thiện
 
-- [ ] PWA: cài lên màn hình, icon, splash
-- [ ] Thông báo trong app (bài mới, trend được ghim)
-- [ ] Trang chủ hoàn chỉnh + dashboard admin
-- [ ] Rà soát toàn bộ theo checklist "XONG" (`03-conventions.md` mục 12)
-- [ ] Test Playwright các luồng chính
-- [ ] Hướng dẫn deploy free (Vercel + Supabase/Neon + R2) — làm khi bạn có tên miền
+- [x] PWA: cài lên màn hình, icon (splash chưa làm)
+- [x] Thông báo trong app (bài mới, trend được duyệt)
+- [x] Trang chủ hoàn chỉnh + dashboard admin
+- [x] Rà soát toàn bộ theo checklist "XONG" (`03-conventions.md` mục 12)
+- [ ] Test Playwright các luồng chính (chưa làm: hiện có test Vitest cho logic)
+- [x] Hướng dẫn deploy free (xem docs/06-deploy.md; R2 và tên miền làm sau)
 
 ## Giai đoạn 2 (sau v1.0, chưa cam kết)
 

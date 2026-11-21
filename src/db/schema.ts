@@ -341,6 +341,25 @@ export const savedTrends = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.trendId] })],
 );
 
+/* ---------- Notifications & settings (Sprint 6) ---------- */
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text().notNull(),
+    title: text().notNull(),
+    body: text().notNull().default(""),
+    link: text(),
+    readAt: timestamp({ withTimezone: true }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("notifications_user_created_idx").on(t.userId, t.createdAt)],
+);
+
 export const settings = pgTable("settings", {
   key: text().primaryKey(),
   value: jsonb().notNull(),

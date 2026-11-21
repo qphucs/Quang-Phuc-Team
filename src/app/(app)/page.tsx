@@ -1,10 +1,12 @@
 import { BookOpen, Download, Music2, TrendingUp, type LucideIcon } from "lucide-react";
 import type { Route } from "next";
-import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { COPY } from "@/lib/copy";
 import { HomeProgress } from "@/features/skills/components/home-progress";
+import { listFeed } from "@/features/trends/service";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import { requireUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +30,11 @@ function greeting(date = new Date()) {
 
 export default async function HomePage() {
   const user = await requireUser();
+  const [capcut, sound] = await Promise.all([
+    listFeed({ type: "capcut_edit", range: "today" }, user.id),
+    listFeed({ type: "sound", range: "today" }, user.id),
+  ]);
+  const hot = [...capcut, ...sound].sort((a, b) => b.heatScore - a.heatScore).slice(0, 3);
   return (
     <div className="flex flex-col gap-6">
       <section className="rounded-md bg-brand-tint p-4">
@@ -49,11 +56,43 @@ export default async function HomePage() {
         ))}
       </nav>
 
-      <section>
-        <h2 className="mb-3 text-h3 font-semibold">Trend nóng hôm nay</h2>
-        <Card>
-          <EmptyState icon={TrendingUp} text={COPY.comingSoon} />
-        </Card>
+      <section className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-h3 font-semibold">Trend nóng hôm nay</h2>
+          <Link href="/trend" className="text-sm font-medium text-brand-ink">
+            Xem tất cả
+          </Link>
+        </div>
+        {hot.length === 0 ? (
+          <Card>
+            <EmptyState icon={TrendingUp} text="Hôm nay chưa có trend nào được duyệt." />
+          </Card>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {hot.map((t) => (
+              <li key={t.id}>
+                <Link
+                  href="/trend"
+                  className="flex items-center gap-3 rounded-md border border-line bg-white p-3 active:bg-surface"
+                >
+                  <div className="size-12 shrink-0 overflow-hidden rounded-sm bg-surface">
+                    {t.coverUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- remote TikTok thumbnail
+                      <img src={t.coverUrl} alt="" referrerPolicy="no-referrer" className="size-full object-cover" />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-ink">{t.title || "Trend mới"}</p>
+                    <p className="text-caption text-muted">{t.type === "sound" ? "Nhạc" : "Edit CapCut"}</p>
+                  </div>
+                  <Badge variant={t.type === "sound" ? "pink" : "violet"}>
+                    {t.type === "sound" ? "Nhạc" : "CapCut"}
+                  </Badge>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );

@@ -3,7 +3,10 @@
 export type UploadedFile = { id: string; kind: "image" | "video" | "document"; originalName: string };
 
 /** Uploads one file through /api/upload and returns its id. Throws a Vietnamese message on failure. */
-export async function uploadFile(file: File, purpose: "image" | "video" | "document"): Promise<UploadedFile> {
+export async function uploadFile(
+  file: File,
+  purpose: "image" | "video" | "document" | "avatar",
+): Promise<UploadedFile> {
   const form = new FormData();
   form.append("file", file);
   form.append("purpose", purpose);

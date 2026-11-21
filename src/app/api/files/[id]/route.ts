@@ -1,6 +1,6 @@
 import { and, eq, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { files, skillAttachments, skills, skillSteps } from "@/db/schema";
+import { files, skillAttachments, skills, skillSteps, users } from "@/db/schema";
 import { AppError, ERROR_CODES } from "@/lib/errors";
 import { can } from "@/lib/permissions";
 import { getSession } from "@/lib/session";
@@ -10,8 +10,14 @@ export const dynamic = "force-dynamic";
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
-/** A member may read a file only when a published skill uses it. Editors may read anything. */
+/** A member may read a file when a published skill uses it, or when it is someone's avatar. Editors may read anything. */
 async function memberCanRead(fileId: string): Promise<boolean> {
+  const [avatar] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.image, `/api/files/${fileId}`))
+    .limit(1);
+  if (avatar) return true;
   const [row] = await db
     .select({ id: skills.id })
     .from(skills)

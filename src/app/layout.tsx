@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
   description: "Cổng nội bộ của team edit CapCut Quang Phúc",
   robots: { index: false, follow: false },
+  appleWebApp: { capable: true, title: "QP Team", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

@@ -6,6 +6,7 @@ import type { SessionUser } from "@/lib/auth";
 import { writeAudit } from "@/lib/audit";
 import { AppError } from "@/lib/errors";
 import { assertSkillUnlocked } from "@/lib/levels";
+import { notifyActiveMembers } from "@/lib/notify";
 import { emit } from "@/lib/realtime";
 import { youtubeId, type SkillInput } from "./schemas";
 
@@ -108,7 +109,14 @@ export async function saveSkill(actor: SessionUser, input: SkillInput & { id?: s
 
 export async function setSkillPublished(actor: SessionUser, id: string, publish: boolean) {
   const [row] = await db
-    .select({ id: skills.id, publishedAt: skills.publishedAt })
+    .select({
+      id: skills.id,
+      status: skills.status,
+      publishedAt: skills.publishedAt,
+      title: skills.title,
+      slug: skills.slug,
+      summary: skills.summary,
+    })
     .from(skills)
     .where(and(eq(skills.id, id), isNull(skills.deletedAt)))
     .limit(1);
@@ -127,10 +135,19 @@ export async function setSkillPublished(actor: SessionUser, id: string, publish:
     targetType: "skill",
     targetId: id,
   });
+  // Notify members only on the first move from draft to published.
+  if (publish && row.status !== "published") {
+    await notifyActiveMembers({
+      type: "skill.published",
+      title: `Bài học mới: ${row.title}`,
+      body: row.summary,
+      link: `/hoc/${row.slug}`,
+      exceptUserId: actor.id,
+    });
+  }
   await emit("skill.updated", { id });
   return { id, status: (publish ? "published" : "draft") as "published" | "draft" };
 }
-
 export async function deleteSkill(actor: SessionUser, id: string) {
   const result = await db
     .update(skills)

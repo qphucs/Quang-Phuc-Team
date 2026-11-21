@@ -7,5 +7,6 @@ export const EVENT_TYPES = [
   "skill.updated",
   "learning.updated",
   "trend.updated",
+  "notification.created",
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];

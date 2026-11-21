@@ -1,6 +1,6 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
@@ -9,5 +9,10 @@ export function Providers({ children }: { children: ReactNode }) {
         defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: true, retry: 1 } },
       }),
   );
+  useEffect(() => {
+    if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
+      void navigator.serviceWorker.register("/sw.js");
+    }
+  }, []);
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }

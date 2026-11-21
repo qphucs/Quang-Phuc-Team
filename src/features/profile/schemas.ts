@@ -20,3 +20,5 @@ export const addChannelSchema = z.object({
 });
 
 export const removeChannelSchema = z.object({ id: z.uuid() });
+
+export const setAvatarSchema = z.object({ fileId: z.uuid() });

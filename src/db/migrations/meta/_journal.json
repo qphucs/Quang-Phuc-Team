@@ -36,6 +36,13 @@
       "when": 1795285036295,
       "tag": "0004_lethal_crystal",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795285382553,
+      "tag": "0005_colossal_captain_flint",
+      "breakpoints": true
     }
   ]
 }

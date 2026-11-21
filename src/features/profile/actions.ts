@@ -2,11 +2,11 @@
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
-import { tiktokChannels, users } from "@/db/schema";
+import { files, tiktokChannels, users } from "@/db/schema";
 import { action } from "@/lib/action";
 import { AppError } from "@/lib/errors";
 import { emit } from "@/lib/realtime";
-import { addChannelSchema, removeChannelSchema, updateOwnProfileSchema } from "./schemas";
+import { addChannelSchema, removeChannelSchema, setAvatarSchema, updateOwnProfileSchema } from "./schemas";
 
 /** Any signed-in member edits their own profile. */
 export const updateOwnProfile = action({
@@ -18,6 +18,20 @@ export const updateOwnProfile = action({
       .where(eq(users.id, user.id));
     await emit("member.updated", { id: user.id });
     return { id: user.id };
+  },
+});
+
+export const setMyAvatar = action({
+  schema: setAvatarSchema,
+  handler: async (input, { user }) => {
+    const [file] = await db.select({ kind: files.kind }).from(files).where(eq(files.id, input.fileId)).limit(1);
+    if (!file || file.kind !== "image") throw new AppError("VALIDATION_ERROR", "Hãy chọn một ảnh.");
+    await db
+      .update(users)
+      .set({ image: `/api/files/${input.fileId}` })
+      .where(eq(users.id, user.id));
+    await emit("member.updated", { id: user.id });
+    return { image: `/api/files/${input.fileId}` };
   },
 });
 

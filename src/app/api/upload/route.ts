@@ -9,13 +9,10 @@ export const dynamic = "force-dynamic";
 
 const MAX_REQUEST_BYTES = 210 * 1024 * 1024; // largest allowed file + form overhead
 
-/** Editors upload a single file (skill cover, video, step image or attachment). */
+/** Editors upload skill files; every member may upload an avatar image. */
 export async function POST(request: Request) {
   const session = await getSession();
   if (!session) return Response.json({ ok: false, error: { code: "UNAUTHENTICATED" } }, { status: 401 });
-  if (!can(session.user, "skill:write")) {
-    return Response.json({ ok: false, error: { code: "FORBIDDEN" } }, { status: 403 });
-  }
 
   const declared = Number(request.headers.get("content-length") ?? 0);
   if (declared > MAX_REQUEST_BYTES) {
@@ -27,9 +24,11 @@ export async function POST(request: Request) {
     const file = form.get("file");
     const purpose = form.get("purpose");
     if (!(file instanceof File)) throw new AppError("VALIDATION_ERROR", "Chưa chọn tệp.");
+    const isAvatar = purpose === "avatar";
+    if (!isAvatar && !can(session.user, "skill:write")) throw new AppError("FORBIDDEN");
 
     const expected: UploadKind | undefined =
-      purpose === "image" || purpose === "video" || purpose === "document" ? purpose : undefined;
+      purpose === "image" || isAvatar ? "image" : purpose === "video" || purpose === "document" ? purpose : undefined;
     const saved = await saveUpload(new Uint8Array(await file.arrayBuffer()), expected);
 
     const [row] = await db
